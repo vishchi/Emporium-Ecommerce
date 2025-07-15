@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useForm, SubmitHandler } from "react-hook-form";
-import { storage } from '@/utils/Firebase'
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
 import { TailSpin } from 'react-loader-spinner';
 import { useRouter } from 'next/navigation';
@@ -38,32 +36,20 @@ interface loaderType {
 
 
 
-const uploadImages = async (file: File) => {
-    const createFileName = () => {
-        const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 8);
-        return `${file?.name}-${timestamp}-${randomString}`;
-    }
-
-    const fileName = createFileName();
-    const storageRef = ref(storage, `ecommerce/category/${fileName}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    return new Promise((resolve, reject) => {
-        uploadTask.on('state_changed', (snapshot) => {
-        }, (error) => {
-            console.log(error)
-            reject(error);
-        }, () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                resolve(downloadURL);
-            }).catch((error) => {
-                console.log(error)
-                reject(error);
-            });
-        });
+const uploadImageToCloudinary = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'ztqnpcmt');
+  
+    const res = await fetch('https://api.cloudinary.com/v1_1/dtr4nxsdu/image/upload', {
+      method: 'POST',
+      body: formData,
     });
-}
+  
+    if (!res.ok) throw new Error('Image upload failed');
+    const data = await res.json();
+    return data.secure_url;
+  };
 
 
 
@@ -121,8 +107,7 @@ export default function AddProduct() {
         setLoader(true)
         const CheckFileSize = maxSize(data.image[0]);
         if (CheckFileSize) return toast.error('Image size must be less then 1MB')
-        const uploadImageToFirebase = await uploadImages(data.image[0]);
-        // const uploadImageToFirebase = 'https://firebasestorage.googleapis.com/v0/b/socialapp-9b83f.appspot.com/o/ecommerce%2Fcategory%2Fimages131.jpg-1683339363348-c4vcab?alt=media&token=f9303ff9-7d34-4514-a53f-832f72814337';
+        const uploadImageToFirebase = await uploadImageToCloudinary(data.image[0]);
 
         const finalData = { productName: data.name, productDescription: data.description, productImage: uploadImageToFirebase, productSlug: data.slug , productFeatured  : data.feature , productPrice : data.price , productQuantity : data.quantity , productCategory : data.categoryID}
         const res = await add_new_product(finalData)

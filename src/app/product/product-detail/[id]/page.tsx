@@ -135,7 +135,7 @@ export default function Page({ params, searchParams }: { params: pageParam, sear
                                 <p className=' py-2   lg:h-40 w-full'>
                                     {prodData?.productDescription} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum, Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum, blanditiis.
                                 </p>
-                                <h1 className='text-3xl font-semibold text-black py-2'>$ {`${prodData?.productPrice}`}</h1>
+                                <h1 className='text-3xl font-semibold text-black py-2'>Rs {`${prodData?.productPrice}`}</h1>
                                 <div className='w-full py-2 lg:flex-row flex-col flex '>
                                     <button onClick={AddToCart} className='btn m-2 lg:w-52 h-10 btn-outline btn-success flex items-center justify-center'> <BiCartAdd className='text-3xl mx-2' /> Add to Cart</button>
                                     <button onClick={AddToBookmark} className='btn m-2  lg:w-52 h-10 btn-outline btn-success flex items-center justify-center'> <RiBookMarkFill className='text-3xl mx-2' />Bookmark</button>
